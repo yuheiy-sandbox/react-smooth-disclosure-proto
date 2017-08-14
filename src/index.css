@@ -1,0 +1,16 @@
+section > h2 > button {
+  font-size: inherit;
+}
+
+section > .ReactSmoothDisclosure-wrapper {
+  max-width: 600px;
+  background-color: yellow;
+}
+
+section:nth-child(1) > .ReactSmoothDisclosure-wrapper.is-closed {
+  visibility: hidden;
+}
+
+section:nth-child(2) > .ReactSmoothDisclosure-wrapper.is-closed {
+  visibility: hidden;
+}
