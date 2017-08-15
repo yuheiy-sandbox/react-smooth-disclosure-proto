@@ -1,21 +1,25 @@
 ```jsx
 <SmoothDisclosure
   isOpened={true | false}
-  closedHeight={0}
-  openedHeight={0}
+  closedHeight={200}
+  openedHeight={800}
   springConfig={{}}
-  onRest={() => {}}
-  components={{
-    wrapper: 'div',
-    inner: 'div',
+  onToggle={() => {}}
+  onAfterOpen={() => {}}
+  onAfterClose={() => {}}
+  className={{
+    base: 'ReactSmoothDisclosure-wrapper',
+    opening: 'is-opening',
+    opened: 'is-opened',
+    closing: 'is-closing',
+    closed: 'is-closed',
   }}
-  styles={{
-    wrapper: {},
-    inner: {},
-  }}
-  classNames={{
-    wrapper: '',
-    inner: '',
+  innerClassName={{
+    base: 'ReactSmoothDisclosure-inner',
+    opening: 'is-opening',
+    opened: 'is-opened',
+    closing: 'is-closing',
+    closed: 'is-closed',
   }}
 
   {...wrapperAttrs}
@@ -24,6 +28,8 @@
   <p>ipsum</p>
 </SmoothDisclosure>
 ```
+
+a11y example:
 
 ```jsx
 <h1 id="heading"><button aria-controls="content">toggle</button></h1>

@@ -11,9 +11,20 @@ const defaultSpringConfig = {
   damping: 27,
 }
 
-const defaultClassNames = {
-  wrapper: 'ReactSmoothDisclosure-wrapper',
-  inner: 'ReactSmoothDisclosure-inner',
+const defaultClassName = {
+  base: 'ReactSmoothDisclosure-wrapper',
+  opening: 'is-opening',
+  opened: 'is-opened',
+  closing: 'is-closing',
+  closed: 'is-closed',
+}
+
+const defaultInnerClassName = {
+  base: 'ReactSmoothDisclosure-inner',
+  opening: 'is-opening',
+  opened: 'is-opened',
+  closing: 'is-closing',
+  closed: 'is-closed',
 }
 
 export default class SmoothDisclosure extends React.Component {
@@ -22,8 +33,20 @@ export default class SmoothDisclosure extends React.Component {
     closedHeight: -1,
     openedHeight: -1,
     springConfig: defaultSpringConfig,
-    onRest: noop,
-    classNames: defaultClassNames,
+    // onToggle: noop,
+    onToggle: () => {
+      console.log('toggle')
+    },
+    // onAfterOpen: noop,
+    onAfterOpen: () => {
+      console.log('after open')
+    },
+    // onAfterClose: noop,
+    onAfterClose: () => {
+      console.log('after close')
+    },
+    className: defaultClassName,
+    innerClassName: defaultInnerClassName,
   }
 
   state = {
@@ -41,7 +64,7 @@ export default class SmoothDisclosure extends React.Component {
   componentDidUpdate(prevProps) {
     if (prevProps.isOpened !== this.props.isOpened) {
       const to = this.getTo()
-      this.setState({to, isResting: false, shouldAnimate: true})
+      this.setState({to, isResting: false, shouldAnimate: true}, () => this.props.onToggle())
     }
   }
 
@@ -66,13 +89,34 @@ export default class SmoothDisclosure extends React.Component {
           : this.state.to,
       },
       onRest: () => {
-        this.setState({isResting: true})
-      }
+        if (!this.state.isResting) {
+          this.setState({isResting: true}, () => {
+            const {isOpened, onAfterOpen, onAfterClose} = this.props
+            if (isOpened) {
+              onAfterOpen()
+            } else {
+              onAfterClose()
+            }
+          })
+        }
+      },
     }
   }
 
   renderMotionChildren = ({height}) => {
-    const {isOpened: shouldOpen, classNames: cssClassNames, openedHeight, children} = this.props
+    const {
+      isOpened: shouldOpen,
+      className,
+      innerClassName,
+      openedHeight,
+      children,
+      closedHeight: _closedHeight,
+      springConfig: _springConfig,
+      onToggle: _onToggle,
+      onAfterOpen: _onAfterOpen,
+      onAfterClose: _onAfterClose,
+      ...wrapperProps,
+    } = this.props
     const {isResting} = this.state
     const isOpening = !isResting && shouldOpen
     const isClosing = !isResting && !shouldOpen
@@ -80,11 +124,11 @@ export default class SmoothDisclosure extends React.Component {
     const hasClosed = isResting && !shouldOpen
     return <div
       ref={c => this.wrapperEl = c}
-      className={classNames(cssClassNames.wrapper, {
-        'is-opening': isOpening,
-        'is-closing': isClosing,
-        'is-opened': hasOpened,
-        'is-closed': hasClosed,
+      className={classNames(className.base, {
+        [className.opening]: isOpening,
+        [className.closing]: isClosing,
+        [className.opened]: hasOpened,
+        [className.closed]: hasClosed,
       })}
       style={{
         overflow: 'hidden',
@@ -92,10 +136,16 @@ export default class SmoothDisclosure extends React.Component {
           ? (openedHeight > -1) ? openedHeight : 'auto'
           : height,
       }}
+      {...wrapperProps}
     >
       <div
         ref={c => this.innerEl = c}
-        className={cssClassNames.inner}
+        className={classNames(innerClassName.base, {
+          [innerClassName.opening]: isOpening,
+          [innerClassName.closing]: isClosing,
+          [innerClassName.opened]: hasOpened,
+          [innerClassName.closed]: hasClosed,
+        })}
         style={{
           overflow: 'hidden',
         }}
